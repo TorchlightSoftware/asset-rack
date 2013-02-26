@@ -24,6 +24,7 @@ class exports.Asset extends EventEmitter
         @mimetype ?= 'text/plain'
         @hash = options.hash if options.hash?
         @maxAge = options.maxAge if options.maxAge?
+        {@compress} = options
         @allowNoHashCache = options.allowNoHashCache if options.allowNoHashCache?
         @on 'newListener', (event, listener) =>
             if event is 'complete' and @completed is true

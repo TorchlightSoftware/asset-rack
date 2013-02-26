@@ -30,7 +30,7 @@ class exports.Rack extends EventEmitter
                 if asset.contents?
                     @assets.push asset
                 if asset.assets?
-                    @assets = @assets.concat asset.assets
+                    @assets.push asset.assets...
                 next()
             asset.rack = this
             asset.emit 'start'
@@ -97,6 +97,7 @@ class exports.Rack extends EventEmitter
                     headers[key] = value
 
                 headers['x-amz-acl'] = 'public-read' if options.provider is 'amazon'
+                headers['Content-Encoding'] = 'gzip' if asset.compress
 
                 upload = (stream) ->
                   clientOptions =
@@ -106,10 +107,11 @@ class exports.Rack extends EventEmitter
                       stream: stream
 
                   client.upload clientOptions, (error) ->
+                      console.log 'error:', error
                       return next error if error?
                       next()
 
-                if @compress
+                if asset.compress
                   gzip stream.data, (err, data) ->
                     stream.data = data
                     upload stream

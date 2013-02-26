@@ -11,6 +11,7 @@ class exports.StaticAssets extends Asset
         @urlPrefix = options.urlPrefix
         @urlPrefix += '/' unless @urlPrefix.substr(-1, 1) is '/'
         @assets = []
+        {@compress} = options
         {@filter} = options
         @getAssets @dirname, @urlPrefix, =>
             @emit 'created'
@@ -33,6 +34,7 @@ class exports.StaticAssets extends Asset
                         contents: contents
                         mimetype: mime.types[ext.slice(1, ext.length)]
                         hash: @hash
+                        compress: @compress
                         maxAge: @maxAge
                     asset.on 'complete', =>
                         next null, asset
