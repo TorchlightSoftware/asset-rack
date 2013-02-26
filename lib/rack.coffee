@@ -1,3 +1,4 @@
+{gzip} = require 'zlib'
 async = require 'async'
 pkgcloud = require 'pkgcloud'
 {EventEmitter} = require 'events'
@@ -96,15 +97,24 @@ class exports.Rack extends EventEmitter
                     headers[key] = value
 
                 headers['x-amz-acl'] = 'public-read' if options.provider is 'amazon'
-                clientOptions =
-                    container: options.container
-                    remote: url
-                    headers: headers
-                    stream: stream
 
-                client.upload clientOptions, (error) ->
-                    return next error if error?
-                    next()
+                upload = (stream) ->
+                  clientOptions =
+                      container: options.container
+                      remote: url
+                      headers: headers
+                      stream: stream
+
+                  client.upload clientOptions, (error) ->
+                      return next error if error?
+                      next()
+
+                if @compress
+                  gzip stream.data, (err, data) ->
+                    stream.data = data
+                    upload stream
+                else
+                  upload stream
 
             async.forEachSeries assets, uploadAsset, (error) ->
                 if next?
