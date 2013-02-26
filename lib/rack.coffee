@@ -107,7 +107,6 @@ class exports.Rack extends EventEmitter
                       stream: stream
 
                   client.upload clientOptions, (error) ->
-                      console.log 'error:', error
                       return next error if error?
                       next()
 
